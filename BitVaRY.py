@@ -189,7 +189,7 @@ class Bitvary:
         plt.plot(bins, y, 'r--')
         plt.xlabel('Price')
         plt.ylabel('Frequency')
-        print('Please open the "Price v/s Frequency" item from your taskbar for frequency of Prices')
+        print('Please open the "Figure 1" item from your taskbar for frequency of Prices')
         plt.show()
 
     def create_figure(self, sim_df):
@@ -199,7 +199,7 @@ class Bitvary:
         plt.axhline(y=self.prices['Close'][-1], color='r', linestyle='-')
         plt.xlabel('Day')
         plt.ylabel('Price')
-        print('Please open the "Time v/s Price" item from your taskbar for a graphical view of the simulation')
+        print('Please open the "Figure 1" item from your taskbar for a graphical view of the simulation')
         plt.show()
 
 
