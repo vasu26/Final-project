@@ -18,12 +18,21 @@ style.use('ggplot')
 class Bitvary:
 
     def __init__(self):
+        '''
+        prices: the dataframe we are using to store the bitcoin prices for each currency
+        currency: a string that stores the ticker for bitcoin data extraction. This keeps changing as per the user's choice
+        '''
+
         self.prices = None
         self.currency = None
 
     @staticmethod
     def user_input():
-
+        '''
+        This function prompts the user for an input to choose a currency in which they would like to run the simulation
+        :return: Returns the selected currency which becomes the ticker for data extraction from Yahoo
+        selected_currency: a string that takes the user's input and checks if it matches any of the options we provide
+        '''
         selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:"
                                   "\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
 
@@ -42,6 +51,12 @@ class Bitvary:
         return currency
 
     def load_data(self):
+        '''
+        Based on user's input, this function loads the data pertaining to the selected currency into our dataframe
+        :return: nothing
+        start_date: sets the date we want to start extracting data from
+        end_date: sets the last date we want to extract data from
+        '''
         start_date = dt.datetime(2017, 1, 3)
         end_date = dt.datetime(2017, 11, 20)
         print('Extracting Dataset for BITCOIN in ', self.currency.split('-')[1])
@@ -54,31 +69,36 @@ class Bitvary:
             except req.ConnectionError:
                 raise LoadDataException('Unable to download BITCOIN Dataset due to internect connectivity issues')
 
-    def simulation_1(self):
-            returns=self.prices['Close'].pct_change()
-            last_price=self.prices['Close'][-1]
+    def simulations_1000_chart_maker(self):
+        '''
+        This function prepares the first chart that we display with the result of running a 1000 simulations
+        :return:nothing
+        brings up the chart on the user's screen
+        '''
+        returns=self.prices['Close'].pct_change()
+        last_price=self.prices['Close'][-1]
 
-            num_simulations=1000 #Number of simulations
-            days=252 #Number of working days in a year
+        num_simulations=1000 #Number of simulations
+        days=252 #Number of working days in a year
 
-            sim_df=pd.DataFrame()
-            for x in range(num_simulations):
-                count=0
-                daily_volatility=returns.std()
-                price_series=[]
-                price=last_price*(1+np.random.normal(0,daily_volatility))
+        sim_df=pd.DataFrame()
+        for x in range(num_simulations):
+            count=0
+            daily_volatility=returns.std()
+            price_series=[]
+            price=last_price*(1+np.random.normal(0,daily_volatility))
+            price_series.append(price)
+
+            for y in range(days):
+                if count==252:
+                    break
+                price=price_series[count]*(1+np.random.normal(0,daily_volatility))
                 price_series.append(price)
+                count+=1
 
-                for y in range(days):
-                    if count==252:
-                        break
-                    price=price_series[count]*(1+np.random.normal(0,daily_volatility))
-                    price_series.append(price)
-                    count+=1
+            sim_df[x]=price_series
 
-                sim_df[x]=price_series
-
-            self.create_figure(sim_df)
+        self.create_figure(sim_df)
 
     def simulation_2(self):
         days = 252  # Number of working days in a year
@@ -176,4 +196,3 @@ if __name__ == "__main__":
             print(lde)
             break
     print('Exiting the program. Goodbye!')
-
