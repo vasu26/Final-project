@@ -9,17 +9,32 @@ import requests.exceptions as req
 
 style.use('ggplot')
 
-def readstore():
+def readstore(choice):
     start = dt.datetime(2017, 1, 3)
     end = dt.datetime(2017, 11, 20)
-    prices = web.DataReader('BTC-USD', 'yahoo', start, end)['Close']  # give option for EUR, INR
+    print('Extracting Dataset for BITCOIN in ',choice.split('-')[1])
+    prices = web.DataReader(choice, 'yahoo', start, end)['Close']
     return prices
 
 data_loaded=False
+chosencurrency=input("Please choose a base currency for the bitcoin (Enter 1, 2, or 3. Press any other key to exit the program):\n1. USD\n2. INR\n3. EUR\nYour Choice:")
+currency='default'
+if(chosencurrency == '1'):
+    currency='BTC-USD'
+elif(chosencurrency=='2'):
+    currency='BTC-INR'
+elif(chosencurrency=='3'):
+    currency='BTC-EUR'
+exitflag=False
 while not data_loaded:
     try:
-        prices=readstore()
-        data_loaded=True
+        if(currency=='default'):
+            exitflag=True
+            break
+        else:
+            prices=readstore(currency)
+            print('Extraction successful! Running the simulation...')
+            data_loaded=True
     except RemoteDataError:
         pass
     except req.ConnectionError as e:
@@ -28,7 +43,6 @@ while not data_loaded:
 if data_loaded==True:
     returns=prices.pct_change()
     last_price=prices[-1]
-
     #Number of simulations
     num_simulations=1000
     days=252 #number of working days in a year
@@ -55,6 +69,11 @@ if data_loaded==True:
     plt.axhline(y=last_price, color='r',linestyle='-')
     plt.xlabel('Day')
     plt.ylabel('Price')
+    print('Please open the "Figure 1" item from your taskbar to have a graphical view of the simulation')
     plt.show()
 else:
-    print("Sorry we were unable to load the data due to internet connectivity issues. Please check your internet connection and try again! The program will now terminate.")
+    if(exitflag==False):
+        print("Sorry we were unable to load the data due to internet connectivity issues. Please check your internet connection and try again! The program will now terminate.")
+    else:
+        print('Exiting the program now. Goodbye!')
+
