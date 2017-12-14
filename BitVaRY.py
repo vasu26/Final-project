@@ -24,8 +24,8 @@ class Bitvary:
     @staticmethod
     def user_input():
 
-        selected_currency = input("Please choose a base currency for the bitcoin from the following list:"
-                                  "\n USD\n INR\n EUR\n(Press any other key to exit the program) Your Choice:")
+        selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:"
+                                  "\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
 
         if selected_currency.upper() == 'USD':
             currency = 'BTC-USD'
@@ -33,9 +33,12 @@ class Bitvary:
             currency = 'BTC-INR'
         elif selected_currency.upper() == 'EUR':
             currency = 'BTC-EUR'
-        else:
+        elif selected_currency.upper() == 'EXIT':
+            print('\nExiting the program. Goodbye!')
             sys.exit()
-
+        else:
+            print('\nSorry, invalid input! Please try again\n')
+            Bitvary.user_input()
         return currency
 
     def load_data(self):
@@ -46,7 +49,7 @@ class Bitvary:
             try:
                 self.prices = web.DataReader(self.currency, 'yahoo', start_date, end_date)[['Open','Close']]
             except RemoteDataError:
-                print("Trying to fetch data again...")
+                print("Still trying...\n")
                 pass
             except req.ConnectionError:
                 raise LoadDataException('Unable to download BITCOIN Dataset due to internect connectivity issues')
@@ -129,6 +132,8 @@ class Bitvary:
 
     @staticmethod
     def create_histogram(scores):
+        fig = plt.figure()
+        fig.suptitle('Frequencies of expected price occurences')
         n, bins, patches = plt.hist(scores, 100, normed=1, facecolor='green', alpha=0.5)
         # Adding a 'best fit' line
         y = mlab.normpdf(bins, np.median(scores), np.std(scores))
@@ -140,7 +145,7 @@ class Bitvary:
 
     def create_figure(self, sim_df):
         fig = plt.figure()
-        fig.suptitle('Monte Carlo Simulation for predicting the value of BITCOINS in ' + self.currency)
+        fig.suptitle('Monte Carlo Simulation for predicting the value of BITCOINS in ' + self.currency.split('-')[1])
         plt.plot(sim_df)
         plt.axhline(y=self.prices['Close'][-1], color='r', linestyle='-')
         plt.xlabel('Day')
@@ -170,6 +175,5 @@ if __name__ == "__main__":
         except LoadDataException as lde:
             print(lde)
             break
-
     print('Exiting the program. Goodbye!')
 
