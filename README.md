@@ -24,4 +24,4 @@ This model would be a good representation of reality and a great tool for bitcoi
 ## Sources Used:
 For historical data: https://www.kaggle.com/mczielinski/bitcoin-historical-data 
 For problem idea and description & learning about Geometric Brownian Motion: https://www.investopedia.com/articles/07/montecarlo.asp 
-Quora.com for articles on predicting stocks & bitcoin values: https://www.quora.com/What-are-some-predictions-for-the-price-of-Bitcoin-or-Litecoin-by-2019
+    Quora.com for articles on predicting stocks & bitcoin values: https://www.quora.com/What-are-some-predictions-for-the-price-of-Bitcoin-or-Litecoin-by-2019
