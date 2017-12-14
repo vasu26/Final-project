@@ -25,6 +25,12 @@ class Bitvary:
 
         self.prices = None
         self.currency = None
+        self.start_month=''
+        self.end_month = ''
+        self.start_day = ''
+        self.end_day = ''
+        self.start_year = ''
+        self.end_year = ''
 
     @staticmethod
     def user_input():
@@ -50,15 +56,34 @@ class Bitvary:
             Bitvary.user_input()
         return currency
 
+    def date_input_format(self):
+        '''
+        :return:nothing
+        sets the start and end month, day and year to be used by the load_data function
+        '''
+
+        st_dt=input('Please enter the START DATE you would like to start the simulation from (Format: MM-DD-YYYY, please type the hyphens):')
+        en_dt = input('Please enter the END DATE you would like to run the simulation till (Format: MM-DD-YYYY, please type the hyphens):')
+        self.start_month=int(st_dt.split('-')[0])
+        self.start_day = int(st_dt.split('-')[1])
+        self.start_year = int(st_dt.split('-')[2])
+        self.end_month = int(en_dt.split('-')[0])
+        self.end_day = int(en_dt.split('-')[1])
+        self.end_year = int(en_dt.split('-')[2])
+
     def load_data(self):
         '''
         Based on user's input, this function loads the data pertaining to the selected currency into our dataframe
         :return: nothing
-        start_date: sets the date we want to start extracting data from
-        end_date: sets the last date we want to extract data from
+        start_date: uses the values set by date_input_format to set the start date
+        end_date: uses the values set by date_input_format to set the end date
         '''
-        start_date = dt.datetime(2017, 1, 3)
-        end_date = dt.datetime(2017, 11, 20)
+        #start_date = dt.datetime(2017, 1, 3)
+        #end_date = dt.datetime(2017, 11, 20)
+
+        self.date_input_format()
+        start_date = dt.datetime(self.start_year, self.start_month, self.start_day)
+        end_date = dt.datetime(self.end_year, self.end_month, self.end_day)
         print('Extracting Dataset for BITCOIN in ', self.currency.split('-')[1])
         while self.prices is None:
             try:
@@ -101,6 +126,10 @@ class Bitvary:
         self.create_figure(sim_df)
 
     def simulation_2(self):
+        '''
+        This function prepares a histogram of the expected frequencies of prices based on which we can predict a most likely price
+        :return:nothing
+        '''
         days = 252  # Number of working days in a year
         returns = np.log(self.prices['Close'] / self.prices['Open'])
         daily_volatility = np.std(returns)
