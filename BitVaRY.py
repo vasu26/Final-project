@@ -1,6 +1,6 @@
 import pandas as pd
 import pandas_datareader as web
-import datetime as dt
+from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -22,15 +22,10 @@ class Bitvary:
         prices: the dataframe we are using to store the bitcoin prices for each currency
         currency: a string that stores the ticker for bitcoin data extraction. This keeps changing as per the user's choice
         """
-
         self.prices = None
         self.currency = None
-        self.start_month = ''
-        self.end_month = ''
-        self.start_day = ''
-        self.end_day = ''
-        self.start_year = ''
-        self.end_year = ''
+        self.start_date = None
+        self.end_date = None
 
     @staticmethod
     def user_input():
@@ -40,9 +35,7 @@ class Bitvary:
         selected_currency: a string that takes the user's input and checks if it matches any of the options we provide
 
         """
-
-        selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:"
-                                   "\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
+        selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
 
         if selected_currency.upper() == 'USD':
             currency = 'BTC-USD'
@@ -64,18 +57,13 @@ class Bitvary:
         sets the start and end month, day and year to be used by the load_data function
         """
 
-        st_dt = input('Please enter the START DATE you would like to start the simulation from (Format: MM-DD-YYYY, please type the hyphens):')
-        en_dt = input('Please enter the END DATE you would like to run the simulation till (Format: MM-DD-YYYY, please type the hyphens):')
+        start_date_string = input('Please enter the START DATE you would like to start the simulation from (Format: MM-DD-YYYY, please type the hyphens):')
+        end_date_string = input('Please enter the END DATE you would like to run the simulation till (Format: MM-DD-YYYY, please type the hyphens):')
         try:
-            self.start_month = int(st_dt.split('-')[0])
-            self.start_day = int(st_dt.split('-')[1])
-            self.start_year = int(st_dt.split('-')[2])
-            self.end_month = int(en_dt.split('-')[0])
-            self.end_day = int(en_dt.split('-')[1])
-            self.end_year = int(en_dt.split('-')[2])
+            self.start_date = datetime.strptime(start_date_string, '%m-%d-%Y')
+            self.end_date = datetime.strptime(end_date_string, '%m-%d-%Y')
         except ValueError:
-            print("Oops!  Invalid Input.  Try again...")
-            Bitvary.date_input_format(self)
+            raise LoadDataException("Oops! Invalid Date Format.")
 
     def load_data(self):
         """
@@ -84,16 +72,11 @@ class Bitvary:
         start_date: uses the values set by date_input_format to set the start date
         end_date: uses the values set by date_input_format to set the end date
         """
-        # start_date = dt.datetime(2017, 1, 3)
-        # end_date = dt.datetime(2017, 11, 20)
 
-
-        start_date = dt.datetime(self.start_year, self.start_month, self.start_day)
-        end_date = dt.datetime(self.end_year, self.end_month, self.end_day)
         print('Extracting Dataset for BITCOIN in ', self.currency.split('-')[1])
         while self.prices is None:
             try:
-                self.prices = web.DataReader(self.currency, 'yahoo', start_date, end_date)[['Open', 'Close']]
+                self.prices = web.DataReader(self.currency, 'yahoo', self.start_date, self.end_date)[['Open', 'Close']]
                 print(self.prices)
             except RemoteDataError:
                 print("Still trying...\n")
@@ -241,10 +224,9 @@ if __name__ == "__main__":
     while True:
         bitvary = Bitvary()
         bitvary.currency = Bitvary.user_input()
-        bitvary.date_input_format()
         try:
+            bitvary.date_input_format()
             bitvary.load_data()
-           # print(bitvary.load_data().prices)
             print('Extraction successful! Running the simulation...')
             bitvary.simulation_v2()            # Change this to simulation_v1 or simulation_v2 to run the other simulation version we developed
             retry = input('Would you like to run another simulation? (Y or N): ')
