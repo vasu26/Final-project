@@ -246,7 +246,7 @@ if __name__ == "__main__":
             bitvary.load_data()
            # print(bitvary.load_data().prices)
             print('Extraction successful! Running the simulation...')
-            bitvary.simulation_v2()            # Change this to simulation_v1 or simulation_v2 to run the other solution
+            bitvary.simulation_v2()            # Change this to simulation_v1 or simulation_v2 to run the other simulation version we developed
             retry = input('Would you like to run another simulation? (Y or N): ')
             if retry.upper() == 'Y':
                 continue

@@ -20,8 +20,16 @@ This model would be a good representation of reality and a great tool for bitcoi
 
 ## Instructions on how to use the program:
 1. Download and run the script BitVary_v2.py"!
+2. There are 2 options: The current version of our code uses the function "simulation_v2", but you can change this to "simulation_v1" to run the simulation using version 1 
 
 ## Sources Used:
 For historical data: https://www.kaggle.com/mczielinski/bitcoin-historical-data 
 For problem idea and description & learning about Geometric Brownian Motion: https://www.investopedia.com/articles/07/montecarlo.asp 
-    Quora.com for articles on predicting stocks & bitcoin values: https://www.quora.com/What-are-some-predictions-for-the-price-of-Bitcoin-or-Litecoin-by-2019
+Quora.com for articles on predicting stocks & bitcoin values: https://www.quora.com/What-are-some-predictions-for-the-price-of-Bitcoin-or-Litecoin-by-2019
+
+## Simulation Results and Observations:
+We have developed 2 versions simulation functions to simulate the data. You can change the simulation function version and see how the results are similar despite using different simulation techniques. This helps us note that the findings drawn from our simulations have a high chance of being accurate.
+
+Due to the current surge in the Bitcoin price, we did expect the simulations to depict astronoomical increases. What we did not expect were such extreme values (such as $100,000 or even higher), but then again looking at the trend that the Bitcoin has followed over the last month, it sort of justifies a higher than exponential surge in the price.
+
+If we do not include the last few months (November, December), the simulation does mellow down but the observations still show an exponential price increase.
