@@ -44,7 +44,7 @@ class Bitvary:
         elif selected_currency.upper() == 'EUR':
             currency = 'BTC-EUR'
         else:
-            print('\nExiting the program. Goodbye!')
+            print('\nInvalid Input.\nExiting the program. Goodbye!')
             sys.exit()
         return currency
 
