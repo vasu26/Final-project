@@ -35,7 +35,7 @@ class Bitvary:
         selected_currency: a string that takes the user's input and checks if it matches any of the options we provide
 
         """
-        selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
+        selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:\n USD\n INR\n EUR\n Your Choice:")
 
         if selected_currency.upper() == 'USD':
             currency = 'BTC-USD'
@@ -43,12 +43,9 @@ class Bitvary:
             currency = 'BTC-INR'
         elif selected_currency.upper() == 'EUR':
             currency = 'BTC-EUR'
-        elif selected_currency.upper() == 'EXIT':
+        else:
             print('\nExiting the program. Goodbye!')
             sys.exit()
-        else:
-            print('\nSorry, invalid input! Please try again\n')
-            Bitvary.user_input()
         return currency
 
     def date_input_format(self):
