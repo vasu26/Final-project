@@ -18,14 +18,14 @@ style.use('ggplot')
 class Bitvary:
 
     def __init__(self):
-        '''
+        """
         prices: the dataframe we are using to store the bitcoin prices for each currency
         currency: a string that stores the ticker for bitcoin data extraction. This keeps changing as per the user's choice
-        '''
+        """
 
         self.prices = None
         self.currency = None
-        self.start_month=''
+        self.start_month = ''
         self.end_month = ''
         self.start_day = ''
         self.end_day = ''
@@ -34,13 +34,15 @@ class Bitvary:
 
     @staticmethod
     def user_input():
-        '''
+        """
         This function prompts the user for an input to choose a currency in which they would like to run the simulation
         :return: Returns the selected currency which becomes the ticker for data extraction from Yahoo
         selected_currency: a string that takes the user's input and checks if it matches any of the options we provide
-        '''
+
+        """
+
         selected_currency = input("\nPlease choose a base currency for the bitcoin from the following list:"
-                                  "\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
+                                   "\n USD\n INR\n EUR\n(Type 'exit' to exit the program) Your Choice:")
 
         if selected_currency.upper() == 'USD':
             currency = 'BTC-USD'
@@ -57,83 +59,110 @@ class Bitvary:
         return currency
 
     def date_input_format(self):
-        '''
+        """
         :return:nothing
         sets the start and end month, day and year to be used by the load_data function
-        '''
+        """
 
-        st_dt=input('Please enter the START DATE you would like to start the simulation from (Format: MM-DD-YYYY, please type the hyphens):')
+        st_dt = input('Please enter the START DATE you would like to start the simulation from (Format: MM-DD-YYYY, please type the hyphens):')
         en_dt = input('Please enter the END DATE you would like to run the simulation till (Format: MM-DD-YYYY, please type the hyphens):')
-        self.start_month=int(st_dt.split('-')[0])
-        self.start_day = int(st_dt.split('-')[1])
-        self.start_year = int(st_dt.split('-')[2])
-        self.end_month = int(en_dt.split('-')[0])
-        self.end_day = int(en_dt.split('-')[1])
-        self.end_year = int(en_dt.split('-')[2])
+        try:
+            self.start_month = int(st_dt.split('-')[0])
+            self.start_day = int(st_dt.split('-')[1])
+            self.start_year = int(st_dt.split('-')[2])
+            self.end_month = int(en_dt.split('-')[0])
+            self.end_day = int(en_dt.split('-')[1])
+            self.end_year = int(en_dt.split('-')[2])
+        except ValueError:
+            print("Oops!  Invalid Input.  Try again...")
+            Bitvary.date_input_format(self)
 
     def load_data(self):
-        '''
+        """
         Based on user's input, this function loads the data pertaining to the selected currency into our dataframe
         :return: nothing
         start_date: uses the values set by date_input_format to set the start date
         end_date: uses the values set by date_input_format to set the end date
-        '''
-        #start_date = dt.datetime(2017, 1, 3)
-        #end_date = dt.datetime(2017, 11, 20)
+        """
+        # start_date = dt.datetime(2017, 1, 3)
+        # end_date = dt.datetime(2017, 11, 20)
 
-        self.date_input_format()
+
         start_date = dt.datetime(self.start_year, self.start_month, self.start_day)
         end_date = dt.datetime(self.end_year, self.end_month, self.end_day)
         print('Extracting Dataset for BITCOIN in ', self.currency.split('-')[1])
         while self.prices is None:
             try:
-                self.prices = web.DataReader(self.currency, 'yahoo', start_date, end_date)[['Open','Close']]
+                self.prices = web.DataReader(self.currency, 'yahoo', start_date, end_date)[['Open', 'Close']]
+                print(self.prices)
             except RemoteDataError:
                 print("Still trying...\n")
                 pass
             except req.ConnectionError:
                 raise LoadDataException('Unable to download BITCOIN Dataset due to internect connectivity issues')
 
-    def simulations_1000_chart_maker(self):
-        '''
+    def simulation_v1(self):
+        """
         This function prepares the first chart that we display with the result of running a 1000 simulations
         :return:nothing
         brings up the chart on the user's screen
-        '''
-        returns=self.prices['Close'].pct_change()
-        last_price=self.prices['Close'][-1]
 
-        num_simulations=1000 #Number of simulations
-        days=252 #Number of working days in a year
+        >>> bitvary = Bitvary()
+        >>> np.random.seed(1)
+        >>> bitvary.prices =  pd.DataFrame([{'Open': 963.380005, 'Close': 995.440002}, {'Open': 995.440002, 'Close': 1017.049988}, {'Open': 1017.049988, 'Close': 1033.300049}, {'Open': 1033.300049, 'Close': 1135.410034}], index=['01-01-2015','01-02-2015','01-03-2015','01-04-2015'])
+        >>> bitvary.currency = 'BTC-USD'
+        >>> bitvary.simulation_v1()
+        Please open the "Figure 1" item from your taskbar for a graphical view of the simulation
+        """
+        returns = self.prices['Close'].pct_change()
+        last_price = self.prices['Close'][-1]
 
-        sim_df=pd.DataFrame()
+        num_simulations = 1000                              # Number of simulations
+        days = 252                                          # Number of working days in a year
+
+        sim_df = pd.DataFrame()
         for x in range(num_simulations):
-            count=0
-            daily_volatility=returns.std()
-            price_series=[]
-            price=last_price*(1+np.random.normal(0,daily_volatility))
+            count = 0
+            daily_volatility = returns.std()
+            price_series = []
+            price = last_price*(1+np.random.normal(0, daily_volatility))
             price_series.append(price)
 
             for y in range(days):
-                if count==252:
+                if count == 252:
                     break
-                price=price_series[count]*(1+np.random.normal(0,daily_volatility))
+                price = price_series[count]*(1+np.random.normal(0, daily_volatility))
                 price_series.append(price)
-                count+=1
+                count += 1
 
-            sim_df[x]=price_series
+            sim_df[x] = price_series
 
         self.create_figure(sim_df)
 
-    def simulation_2(self):
-        '''
+    def simulation_v2(self):
+        """
         This function prepares a histogram of the expected frequencies of prices based on which we can predict a most likely price
         :return:nothing
-        '''
+
+        >>> bitvary = Bitvary()
+        >>> np.random.seed(1)
+        >>> bitvary.prices =  pd.DataFrame([{'Open': 963.380005, 'Close': 995.440002}, {'Open': 995.440002, 'Close': 1017.049988}, {'Open': 1017.049988, 'Close': 1033.300049}, {'Open': 1033.300049, 'Close': 1135.410034}], index=['01-01-2015','01-02-2015','01-03-2015','01-04-2015'])
+        >>> bitvary.currency = 'BTC-USD'
+        >>> bitvary.simulation_v2()
+        Avg:3639426759.98
+        Median:3229703029.47
+        Min:581409678.937
+        Max:13442105871.0
+        Mean:3639426759.98
+        Standard Deviation:1883957039.13
+        Confidence Interval 95%: 3522518398.150671, 3756335121.801802
+        Please open the "Figure 1" item from your taskbar for a graphical view of the simulation
+        Please open the "Figure 1" item from your taskbar for frequency of Prices
+        """
         days = 252  # Number of working days in a year
         returns = np.log(self.prices['Close'] / self.prices['Open'])
         daily_volatility = np.std(returns)
-        annual_volatility = daily_volatility * ((days) ** (1 / 2))
+        annual_volatility = daily_volatility * (days ** (1 / 2))
         daily_drift = np.average(returns)
         annual_drift = daily_drift * 365
         mean_drift = daily_drift - 0.5 * daily_volatility ** 2
@@ -182,7 +211,7 @@ class Bitvary:
     @staticmethod
     def create_histogram(scores):
         fig = plt.figure()
-        fig.suptitle('Frequencies of expected price occurences')
+        fig.suptitle('Frequencies of expected price occurrences')
         n, bins, patches = plt.hist(scores, 100, normed=1, facecolor='green', alpha=0.5)
         # Adding a 'best fit' line
         y = mlab.normpdf(bins, np.median(scores), np.std(scores))
@@ -212,10 +241,12 @@ if __name__ == "__main__":
     while True:
         bitvary = Bitvary()
         bitvary.currency = Bitvary.user_input()
+        bitvary.date_input_format()
         try:
             bitvary.load_data()
+           # print(bitvary.load_data().prices)
             print('Extraction successful! Running the simulation...')
-            bitvary.simulation_2() # Change this to simulation_1 or simulation_2 to run the other solution
+            bitvary.simulation_v2()            # Change this to simulation_v1 or simulation_v2 to run the other solution
             retry = input('Would you like to run another simulation? (Y or N): ')
             if retry.upper() == 'Y':
                 continue
